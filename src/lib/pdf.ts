@@ -174,7 +174,7 @@ function renderSection(section: { type: string; data: Record<string, unknown>; t
       return `<div>${titleBar}<div class="pdf-block"><p style="max-width:600px;color:#555;">${esc(d.body as string)}</p>${renderHighlights(d.highlights as string[], accent)}</div></div>`;
 
     case 'project_overview':
-      return `<div>${titleBar}<div class="pdf-block"><p style="max-width:600px;color:#555;">${esc(d.body as string)}</p>${renderObjectives(d.objectives as string[], accent)}</div></div>`;
+      return `<div>${titleBar}<div class="pdf-block"><p style="max-width:600px;color:#555;">${esc(d.body as string)}</p></div></div>`;
 
     case 'scope':
     case 'deliverables': {
@@ -310,6 +310,71 @@ function renderSection(section: { type: string; data: Record<string, unknown>; t
           <li style="display:flex;align-items:start;gap:8px;font-size:14px;color:#444;margin-bottom:8px;">
             <span style="margin-top:6px;width:6px;height:6px;border-radius:50%;background:${accent};flex-shrink:0;"></span>${esc(item)}
           </li>`).join('')}</ul>` : ''}
+      </div></div>`;
+    }
+
+    case 'project_goals': {
+      const goals = (d.items as string[]) || [];
+      return `<div>${titleBar}<div>${goals.map((goal, i) => `
+        <div class="pdf-block" style="display:flex;align-items:start;gap:12px;margin-bottom:12px;">
+          <div style="flex-shrink:0;width:24px;height:24px;border-radius:50%;background:${accent};color:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;">${i + 1}</div>
+          <span style="font-size:14px;color:#444;padding-top:4px;">${esc(goal)}</span>
+        </div>`).join('')}</div></div>`;
+    }
+
+    case 'process': {
+      const steps = (d.steps as { title: string; description: string }[]) || [];
+      return `<div>${titleBar}<div>${steps.map((step, i) => `
+        <div class="pdf-block" style="display:flex;gap:16px;margin-bottom:20px;">
+          <div style="display:flex;flex-direction:column;align-items:center;">
+            <div style="flex-shrink:0;width:28px;height:28px;border-radius:50%;background:${accent};color:#fff;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;">${i + 1}</div>
+            ${i < steps.length - 1 ? `<div style="width:2px;flex:1;background:#e5e5e5;margin:4px 0;"></div>` : ''}
+          </div>
+          <div style="padding-bottom:8px;">
+            <div style="font-weight:600;color:#111;">${esc(step.title)}</div>
+            ${step.description ? `<div style="margin-top:4px;font-size:14px;color:#666;">${esc(step.description)}</div>` : ''}
+          </div>
+        </div>`).join('')}</div></div>`;
+    }
+
+    case 'strategy': {
+      const pillars = (d.pillars as string[]) || [];
+      return `<div>${titleBar}<div class="pdf-block">
+        ${(d.body as string) ? `<p style="max-width:600px;color:#555;margin-bottom:20px;">${esc(d.body as string)}</p>` : ''}
+        ${pillars.length > 0 ? `<div style="display:flex;flex-wrap:wrap;gap:10px;">${pillars.map((p) => `
+          <span style="background:${accent};color:#fff;padding:6px 14px;border-radius:8px;font-size:13px;font-weight:500;">${esc(p)}</span>
+        `).join('')}</div>` : ''}
+      </div></div>`;
+    }
+
+    case 'kpis': {
+      const kpiItems = (d.items as { metric: string; target: string; description: string }[]) || [];
+      return `<div>${titleBar}<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;">${kpiItems.map((item) => `
+        <div class="pdf-block" style="border:1px solid #e5e5e5;border-radius:12px;padding:16px;background:#fafafa;">
+          <div style="font-size:24px;font-weight:700;color:${accent};">${esc(item.target)}</div>
+          <div style="font-weight:600;color:#111;margin-top:4px;">${esc(item.metric)}</div>
+          ${item.description ? `<div style="font-size:12px;color:#999;margin-top:4px;">${esc(item.description)}</div>` : ''}
+        </div>`).join('')}</div></div>`;
+    }
+
+    case 'reporting': {
+      const cadence = (d.cadence as string[]) || [];
+      return `<div>${titleBar}<div class="pdf-block">
+        ${(d.body as string) ? `<p style="max-width:600px;color:#555;margin-bottom:16px;">${esc(d.body as string)}</p>` : ''}
+        ${cadence.length > 0 ? `<ul style="padding:0;list-style:none;">${cadence.map((item) => `
+          <li style="display:flex;align-items:center;gap:10px;font-size:14px;color:#444;margin-bottom:8px;">
+            <span style="width:6px;height:6px;border-radius:50%;background:${accent};flex-shrink:0;"></span>${esc(item)}
+          </li>`).join('')}</ul>` : ''}
+      </div></div>`;
+    }
+
+    case 'creative_direction': {
+      const keywords = (d.keywords as string[]) || [];
+      return `<div>${titleBar}<div class="pdf-block">
+        ${(d.body as string) ? `<p style="max-width:600px;color:#555;font-style:italic;border-left:3px solid ${accent};padding-left:16px;margin-bottom:20px;">${esc(d.body as string)}</p>` : ''}
+        ${keywords.length > 0 ? `<div style="display:flex;flex-wrap:wrap;gap:8px;">${keywords.map((kw) => `
+          <span style="border:1px solid #e5e5e5;border-radius:999px;padding:4px 12px;font-size:13px;color:#444;background:#fff;">${esc(kw)}</span>
+        `).join('')}</div>` : ''}
       </div></div>`;
     }
 

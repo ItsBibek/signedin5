@@ -70,6 +70,7 @@ export type SectionType =
   | 'hero'
   | 'about'
   | 'project_overview'
+  | 'project_goals'
   | 'scope'
   | 'deliverables'
   | 'timeline'
@@ -82,6 +83,11 @@ export type SectionType =
   | 'video'
   | 'terms'
   | 'accept'
+  | 'process'
+  | 'strategy'
+  | 'kpis'
+  | 'reporting'
+  | 'creative_direction'
   | 'custom';
 
 export interface Section {

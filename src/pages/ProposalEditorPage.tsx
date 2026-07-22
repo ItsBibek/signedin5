@@ -470,15 +470,7 @@ function SectionEditor({
             <Input value={(d.heading as string) || ''} onChange={(e) => onUpdate({ heading: e.target.value })} disabled={readOnly} />
           </Field>
           <Field label="Body">
-            <Textarea value={(d.body as string) || ''} onChange={(e) => onUpdate({ body: e.target.value })} rows={5} disabled={readOnly} />
-          </Field>
-          <Field label="Objectives (one per line)">
-            <Textarea
-              value={((d.objectives as string[]) || []).join('\n')}
-              onChange={(e) => onUpdate({ objectives: e.target.value.split('\n').filter(Boolean) })}
-              rows={4}
-              disabled={readOnly}
-            />
+            <Textarea value={(d.body as string) || ''} onChange={(e) => onUpdate({ body: e.target.value })} rows={6} disabled={readOnly} />
           </Field>
         </Card>
       );
@@ -878,6 +870,177 @@ function SectionEditor({
           </Field>
           <Field label="Items (one per line)">
             <Textarea value={items.join('\n')} onChange={(e) => onUpdate({ items: e.target.value.split('\n').filter(Boolean) })} rows={4} disabled={readOnly} />
+          </Field>
+        </Card>
+      );
+    }
+
+    case 'project_goals': {
+      const goalItems = (d.items as string[]) || [];
+      return (
+        <Card className="border-neutral-200 p-5">
+          <EditorHeader title="Project Goals" />
+          <Field label="Heading">
+            <Input value={(d.heading as string) || ''} onChange={(e) => onUpdate({ heading: e.target.value })} disabled={readOnly} />
+          </Field>
+          <div className="space-y-2">
+            {goalItems.map((goal, i) => (
+              <div key={i} className="flex gap-2">
+                <span className="mt-2.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-neutral-900 text-xs font-semibold text-white">{i + 1}</span>
+                <Input value={goal} onChange={(e) => onUpdate({ items: goalItems.map((g, idx) => idx === i ? e.target.value : g) })} placeholder="Goal" disabled={readOnly} className="flex-1" />
+                {!readOnly && (
+                  <Button variant="ghost" size="icon" className="h-9 w-9 text-neutral-400" onClick={() => onUpdate({ items: goalItems.filter((_, idx) => idx !== i) })}>
+                    <Trash2 className="h-3 w-3" />
+                  </Button>
+                )}
+              </div>
+            ))}
+            {!readOnly && (
+              <Button variant="outline" size="sm" onClick={() => onUpdate({ items: [...goalItems, ''] })} className="mt-2 gap-1.5">
+                <Plus className="h-4 w-4" /> Add goal
+              </Button>
+            )}
+          </div>
+        </Card>
+      );
+    }
+
+    case 'process': {
+      const steps = (d.steps as { id: string; title: string; description: string }[]) || [];
+      return (
+        <Card className="border-neutral-200 p-5">
+          <EditorHeader title="Our Process" />
+          <Field label="Heading">
+            <Input value={(d.heading as string) || ''} onChange={(e) => onUpdate({ heading: e.target.value })} disabled={readOnly} />
+          </Field>
+          <div className="space-y-3">
+            {steps.map((step, i) => (
+              <div key={step.id} className="rounded-xl border border-neutral-200 p-3">
+                <div className="mb-2 flex items-center justify-between">
+                  <span className="text-xs font-medium text-neutral-400">Step {i + 1}</span>
+                  {!readOnly && (
+                    <Button variant="ghost" size="icon" className="h-6 w-6 text-neutral-400" onClick={() => onUpdate({ steps: steps.filter((_, idx) => idx !== i) })}>
+                      <Trash2 className="h-3 w-3" />
+                    </Button>
+                  )}
+                </div>
+                <Input value={step.title} onChange={(e) => onUpdate({ steps: steps.map((x, idx) => idx === i ? { ...x, title: e.target.value } : x) })} placeholder="Step title" disabled={readOnly} className="mb-2" />
+                <Textarea value={step.description} onChange={(e) => onUpdate({ steps: steps.map((x, idx) => idx === i ? { ...x, description: e.target.value } : x) })} placeholder="Description" rows={2} disabled={readOnly} />
+              </div>
+            ))}
+            {!readOnly && (
+              <Button variant="outline" size="sm" onClick={() => onUpdate({ steps: [...steps, { id: uid(), title: '', description: '' }] })} className="gap-1.5">
+                <Plus className="h-4 w-4" /> Add step
+              </Button>
+            )}
+          </div>
+        </Card>
+      );
+    }
+
+    case 'strategy': {
+      const pillars = (d.pillars as string[]) || [];
+      return (
+        <Card className="border-neutral-200 p-5">
+          <EditorHeader title="Strategy" />
+          <Field label="Heading">
+            <Input value={(d.heading as string) || ''} onChange={(e) => onUpdate({ heading: e.target.value })} disabled={readOnly} />
+          </Field>
+          <Field label="Body">
+            <Textarea value={(d.body as string) || ''} onChange={(e) => onUpdate({ body: e.target.value })} rows={5} disabled={readOnly} />
+          </Field>
+          <Field label="Strategy pillars (one per line)">
+            <Textarea
+              value={pillars.join('\n')}
+              onChange={(e) => onUpdate({ pillars: e.target.value.split('\n').filter(Boolean) })}
+              rows={4}
+              disabled={readOnly}
+              placeholder="Brand positioning\nAudience targeting\nChannel mix"
+            />
+          </Field>
+        </Card>
+      );
+    }
+
+    case 'kpis': {
+      const kpiItems = (d.items as { id: string; metric: string; target: string; description: string }[]) || [];
+      return (
+        <Card className="border-neutral-200 p-5">
+          <EditorHeader title="KPIs & Success Metrics" />
+          <Field label="Heading">
+            <Input value={(d.heading as string) || ''} onChange={(e) => onUpdate({ heading: e.target.value })} disabled={readOnly} />
+          </Field>
+          <div className="space-y-3">
+            {kpiItems.map((item, i) => (
+              <div key={item.id} className="rounded-xl border border-neutral-200 p-3">
+                <div className="mb-2 flex items-center justify-between">
+                  <span className="text-xs font-medium text-neutral-400">KPI {i + 1}</span>
+                  {!readOnly && (
+                    <Button variant="ghost" size="icon" className="h-6 w-6 text-neutral-400" onClick={() => onUpdate({ items: kpiItems.filter((_, idx) => idx !== i) })}>
+                      <Trash2 className="h-3 w-3" />
+                    </Button>
+                  )}
+                </div>
+                <div className="grid grid-cols-2 gap-2 mb-2">
+                  <Input value={item.metric} onChange={(e) => onUpdate({ items: kpiItems.map((x, idx) => idx === i ? { ...x, metric: e.target.value } : x) })} placeholder="Metric name" disabled={readOnly} />
+                  <Input value={item.target} onChange={(e) => onUpdate({ items: kpiItems.map((x, idx) => idx === i ? { ...x, target: e.target.value } : x) })} placeholder="Target (e.g. +30/mo)" disabled={readOnly} />
+                </div>
+                <Input value={item.description} onChange={(e) => onUpdate({ items: kpiItems.map((x, idx) => idx === i ? { ...x, description: e.target.value } : x) })} placeholder="Short description" disabled={readOnly} />
+              </div>
+            ))}
+            {!readOnly && (
+              <Button variant="outline" size="sm" onClick={() => onUpdate({ items: [...kpiItems, { id: uid(), metric: '', target: '', description: '' }] })} className="gap-1.5">
+                <Plus className="h-4 w-4" /> Add KPI
+              </Button>
+            )}
+          </div>
+        </Card>
+      );
+    }
+
+    case 'reporting': {
+      const cadence = (d.cadence as string[]) || [];
+      return (
+        <Card className="border-neutral-200 p-5">
+          <EditorHeader title="Reporting" />
+          <Field label="Heading">
+            <Input value={(d.heading as string) || ''} onChange={(e) => onUpdate({ heading: e.target.value })} disabled={readOnly} />
+          </Field>
+          <Field label="Body">
+            <Textarea value={(d.body as string) || ''} onChange={(e) => onUpdate({ body: e.target.value })} rows={4} disabled={readOnly} />
+          </Field>
+          <Field label="Reporting cadence (one per line)">
+            <Textarea
+              value={cadence.join('\n')}
+              onChange={(e) => onUpdate({ cadence: e.target.value.split('\n').filter(Boolean) })}
+              rows={4}
+              disabled={readOnly}
+              placeholder="Weekly performance summary\nMonthly analytics report\nQuarterly strategy review"
+            />
+          </Field>
+        </Card>
+      );
+    }
+
+    case 'creative_direction': {
+      const keywords = (d.keywords as string[]) || [];
+      return (
+        <Card className="border-neutral-200 p-5">
+          <EditorHeader title="Creative Direction" />
+          <Field label="Heading">
+            <Input value={(d.heading as string) || ''} onChange={(e) => onUpdate({ heading: e.target.value })} disabled={readOnly} />
+          </Field>
+          <Field label="Body">
+            <Textarea value={(d.body as string) || ''} onChange={(e) => onUpdate({ body: e.target.value })} rows={5} disabled={readOnly} placeholder="Describe the visual and tonal direction..." />
+          </Field>
+          <Field label="Keywords / tone words (one per line)">
+            <Textarea
+              value={keywords.join('\n')}
+              onChange={(e) => onUpdate({ keywords: e.target.value.split('\n').filter(Boolean) })}
+              rows={4}
+              disabled={readOnly}
+              placeholder="Bold\nMinimal\nTimeless"
+            />
           </Field>
         </Card>
       );

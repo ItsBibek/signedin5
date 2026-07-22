@@ -17,41 +17,41 @@ export const TEMPLATES: TemplateDef[] = [
     id: 'generic',
     name: 'Generic',
     category: 'General',
-    description: 'A clean, versatile template for any project',
+    description: 'A clean, versatile template for any freelance project or service',
     accent: '#0a0a0a',
     layout: 'classic',
     font: 'inter',
-    sections: ['hero', 'project_overview', 'scope', 'timeline', 'pricing', 'terms'],
+    sections: ['hero', 'project_overview', 'project_goals', 'scope', 'deliverables', 'timeline', 'pricing', 'terms', 'accept'],
   },
   {
     id: 'web-design',
     name: 'Web Design',
     category: 'Web Design',
-    description: 'For website design and development projects',
+    description: 'For website design, development, and digital platform projects',
     accent: '#2563eb',
     layout: 'modern',
     font: 'inter',
-    sections: ['hero', 'about', 'project_overview', 'scope', 'deliverables', 'timeline', 'packages', 'addons', 'faq'],
+    sections: ['hero', 'about', 'project_overview', 'process', 'scope', 'deliverables', 'timeline', 'packages', 'addons', 'pricing', 'terms', 'accept'],
   },
   {
     id: 'marketing',
     name: 'Marketing',
     category: 'Marketing',
-    description: 'For strategy, campaigns, and growth proposals',
+    description: 'For retainers, campaigns, and growth strategy proposals',
     accent: '#d97706',
     layout: 'bold',
     font: 'inter',
-    sections: ['hero', 'about', 'project_overview', 'scope', 'case_studies', 'packages', 'addons', 'timeline'],
+    sections: ['hero', 'about', 'project_overview', 'strategy', 'scope', 'kpis', 'case_studies', 'timeline', 'pricing', 'reporting', 'terms', 'accept'],
   },
   {
     id: 'creative',
     name: 'Creative',
     category: 'Creative',
-    description: 'For brand concepts, campaigns, and visual storytelling',
+    description: 'For brand identity, visual direction, and creative campaigns',
     accent: '#db2777',
     layout: 'editorial',
     font: 'serif',
-    sections: ['hero', 'about', 'project_overview', 'scope', 'deliverables', 'testimonials', 'pricing', 'faq'],
+    sections: ['hero', 'about', 'creative_direction', 'project_overview', 'scope', 'deliverables', 'testimonials', 'timeline', 'pricing', 'terms', 'accept'],
   },
 ];
 
@@ -84,7 +84,7 @@ export function buildPreviewProposal(templateId: string): Proposal {
       depositPercent: 50,
       depositDue: 'upon signing',
       balanceDue: 'upon final approval',
-      notes: 'A 50% deposit reserves the production window and kicks off the first milestone.',
+      notes: 'A 50% deposit reserves your project window.',
     },
     branding: { business_name: content.businessName, logo_url: null, brand_color: template.accent },
     total_value: content.pricingSubtotal,
@@ -117,7 +117,14 @@ export function buildDefaultSection(type: SectionType): Section {
   const defaults: Record<SectionType, { title: string; data: Record<string, unknown> }> = {
     hero: { title: 'Hero', data: { headline: 'Your project title', subheadline: 'A short summary of the work and its goals.', cta_text: 'Accept & Sign' } },
     about: { title: 'About Me', data: { heading: 'About', body: 'Write a concise introduction here.', highlights: ['Key point one', 'Key point two', 'Key point three'] } },
-    project_overview: { title: 'Project Overview', data: { heading: 'Project Overview', body: 'Describe the problem, the goal, and the expected outcome.', objectives: ['Objective one', 'Objective two', 'Objective three'] } },
+    project_overview: { title: 'Project Overview', data: { heading: 'Project Overview', body: 'Describe the problem, the goal, and the expected outcome.' } },
+    project_goals: {
+      title: 'Project Goals',
+      data: {
+        heading: 'Project Goals',
+        items: ['Goal one — what success looks like', 'Goal two — a measurable outcome', 'Goal three — a quality standard'],
+      },
+    },
     scope: {
       title: 'Scope of Work',
       data: {
@@ -154,20 +161,20 @@ export function buildDefaultSection(type: SectionType): Section {
       },
     },
     pricing: {
-      title: 'Pricing',
+      title: 'Investment',
       data: {
-        heading: 'Pricing',
+        heading: 'Investment',
         items: [{ id: uid(), description: 'Line item one', quantity: 1, rate: 1000, amount: 1000 }],
         taxRate: 0,
-        notes: 'Add pricing notes here.',
+        notes: '',
       },
     },
     packages: {
       title: 'Packages',
       data: {
-        heading: 'Packages',
+        heading: 'Choose Your Package',
         packages: [
-          { id: uid(), name: 'Starter', price: 1000, description: 'A lighter option to get started.', features: ['Feature one', 'Feature two', 'Feature three'] },
+          { id: uid(), name: 'Essentials', price: 1000, description: 'A focused option to get started.', features: ['Feature one', 'Feature two', 'Feature three'] },
           { id: uid(), name: 'Growth', price: 2000, description: 'The recommended option for most projects.', features: ['Feature one', 'Feature two', 'Feature three', 'Feature four'], popular: true },
           { id: uid(), name: 'Premium', price: 3000, description: 'The fully managed option.', features: ['Feature one', 'Feature two', 'Feature three', 'Feature four'] },
         ] as PricingPackage[],
@@ -176,11 +183,10 @@ export function buildDefaultSection(type: SectionType): Section {
     addons: {
       title: 'Add-ons',
       data: {
-        heading: 'Add-ons',
+        heading: 'Optional Add-ons',
         addons: [
-          { id: uid(), name: 'Add-on one', price: 250, description: 'Optional extra support.' },
-          { id: uid(), name: 'Add-on two', price: 500, description: 'Optional extra support.' },
-          { id: uid(), name: 'Add-on three', price: 750, description: 'Optional extra support.' },
+          { id: uid(), name: 'Add-on one', price: 250, description: 'Optional extra service.' },
+          { id: uid(), name: 'Add-on two', price: 500, description: 'Optional extra service.' },
         ] as AddOn[],
       },
     },
@@ -191,14 +197,13 @@ export function buildDefaultSection(type: SectionType): Section {
         items: [
           { id: uid(), question: 'Question one?', answer: 'Answer one.' },
           { id: uid(), question: 'Question two?', answer: 'Answer two.' },
-          { id: uid(), question: 'Question three?', answer: 'Answer three.' },
         ],
       },
     },
     testimonials: {
       title: 'Testimonials',
       data: {
-        heading: 'Testimonials',
+        heading: 'What Clients Say',
         items: [
           { id: uid(), quote: 'A short testimonial goes here.', author: 'Client Name', role: 'Role', rating: 5 },
           { id: uid(), quote: 'A second testimonial goes here.', author: 'Client Name', role: 'Role', rating: 5 },
@@ -206,12 +211,59 @@ export function buildDefaultSection(type: SectionType): Section {
       },
     },
     case_studies: {
-      title: 'Case Studies',
-      data: { heading: 'Case Studies', items: [{ id: uid(), project: 'Project one', problem: 'Describe the challenge.', result: 'Describe the result.' }] },
+      title: 'Previous Results',
+      data: { heading: 'Previous Results', items: [{ id: uid(), project: 'Project one', problem: 'Describe the challenge.', result: 'Describe the measurable result.' }] },
     },
-    video: { title: 'Video Introduction', data: { heading: 'Video Introduction', url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ' } },
-    terms: { title: 'Terms & Conditions', data: { heading: 'Terms & Conditions', depositPercent: 50, depositDue: 'upon signing', balanceDue: 'upon completion', notes: 'Add your terms here.' } },
-    accept: { title: 'Accept & Sign', data: { heading: 'Accept & Sign', body: 'Use this section to confirm the next step.' } },
+    video: { title: 'Video Introduction', data: { heading: 'Video Introduction', url: '' } },
+    terms: { title: 'Terms & Conditions', data: { heading: 'Terms & Conditions', depositPercent: 50, depositDue: 'upon signing', balanceDue: 'upon completion', notes: '' } },
+    accept: { title: 'Accept & Sign', data: { heading: 'Ready to proceed?', body: 'By signing this proposal, you agree to the scope, timeline, and terms outlined above.' } },
+    process: {
+      title: 'Our Process',
+      data: {
+        heading: 'Our Process',
+        steps: [
+          { id: uid(), title: 'Discovery', description: 'We align on your goals, audience, and technical requirements before a single line is written.' },
+          { id: uid(), title: 'Design', description: 'Wireframes and visual design with a structured feedback round.' },
+          { id: uid(), title: 'Development', description: 'Building the final product with clean, tested code.' },
+          { id: uid(), title: 'Launch', description: 'Deployment, QA, and full handoff documentation.' },
+        ],
+      },
+    },
+    strategy: {
+      title: 'Strategy',
+      data: {
+        heading: 'Strategy',
+        body: 'Describe the strategic approach — what levers you are pulling, why, and how they connect to the client\'s goals.',
+        pillars: ['Brand positioning', 'Audience targeting', 'Channel mix', 'Content strategy'],
+      },
+    },
+    kpis: {
+      title: 'KPIs & Success Metrics',
+      data: {
+        heading: 'KPIs & Success Metrics',
+        items: [
+          { id: uid(), metric: 'Qualified Leads', target: '+30/mo', description: 'Monthly qualified leads generated from all channels.' },
+          { id: uid(), metric: 'Cost Per Acquisition', target: '−20%', description: 'Reduce CAC through improved targeting and creative.' },
+          { id: uid(), metric: 'ROAS', target: '3x', description: 'Return on ad spend across all active campaigns.' },
+        ],
+      },
+    },
+    reporting: {
+      title: 'Reporting',
+      data: {
+        heading: 'Reporting',
+        body: 'We keep you informed at every stage with clear, concise reporting — no dashboards to learn, no jargon.',
+        cadence: ['Weekly performance summary (email)', 'Monthly analytics report (PDF)', 'Quarterly strategy review (call)'],
+      },
+    },
+    creative_direction: {
+      title: 'Creative Direction',
+      data: {
+        heading: 'Creative Direction',
+        body: 'Describe the visual and tonal direction — the feeling the work should evoke and the aesthetic principles guiding every decision.',
+        keywords: ['Bold', 'Minimal', 'Timeless', 'Confident', 'Premium'],
+      },
+    },
     custom: { title: 'Custom Section', data: { heading: 'Custom Section', body: 'Add your own content here.', items: [] } },
   };
 
@@ -234,13 +286,12 @@ type PreviewContent = {
   projectDescription: string;
   aboutBody: string;
   overviewBody: string;
-  objectives: string[];
+  goals: string[];
   highlights: string[];
   scopeItems: { id: string; title: string; description: string }[];
   deliverables: { id: string; title: string; description: string }[];
   packages: PricingPackage[];
   addOns: AddOn[];
-  faq: { id: string; question: string; answer: string }[];
   testimonials: { id: string; quote: string; author: string; role: string; rating: number }[];
   caseStudies: { id: string; project: string; problem: string; result: string }[];
   videoUrl: string;
@@ -251,13 +302,16 @@ function buildPreviewSections(templateId: string, content: PreviewContent): Sect
     const section = buildDefaultSection(type);
     switch (type) {
       case 'hero':
-        section.data = { headline: content.projectTitle, subheadline: content.projectDescription, cta_text: 'Review the proposal' };
+        section.data = { headline: content.projectTitle, subheadline: content.projectDescription, cta_text: 'Accept & Sign' };
         break;
       case 'about':
         section.data = { heading: 'About the Studio', body: content.aboutBody, highlights: content.highlights };
         break;
       case 'project_overview':
-        section.data = { heading: 'Project Overview', body: content.overviewBody, objectives: content.objectives };
+        section.data = { heading: 'Project Overview', body: content.overviewBody };
+        break;
+      case 'project_goals':
+        section.data = { heading: 'Project Goals', items: content.goals };
         break;
       case 'scope':
         section.data = { heading: 'Scope of Work', items: content.scopeItems };
@@ -269,31 +323,67 @@ function buildPreviewSections(templateId: string, content: PreviewContent): Sect
         section.data = { heading: 'Timeline', startDate: content.timeline.startDate, endDate: content.timeline.endDate, milestones: content.timeline.milestones };
         break;
       case 'pricing':
-        section.data = { heading: 'Investment', items: content.pricingItems, taxRate: 0, notes: 'All pricing is fixed for the scope outlined in this proposal.' };
+        section.data = { heading: 'Investment', items: content.pricingItems, taxRate: 0, notes: '' };
         break;
       case 'packages':
-        section.data = { heading: 'Package Options', packages: content.packages };
+        section.data = { heading: 'Choose Your Package', packages: content.packages };
         break;
       case 'addons':
         section.data = { heading: 'Optional Add-ons', addons: content.addOns };
-        break;
-      case 'faq':
-        section.data = { heading: 'FAQ', items: content.faq };
         break;
       case 'testimonials':
         section.data = { heading: 'What Clients Say', items: content.testimonials };
         break;
       case 'case_studies':
-        section.data = { heading: 'Recent Work', items: content.caseStudies };
+        section.data = { heading: 'Previous Results', items: content.caseStudies };
         break;
       case 'video':
         section.data = { heading: 'Video Introduction', url: content.videoUrl };
         break;
       case 'terms':
-        section.data = { heading: 'Payment Terms', depositPercent: 50, depositDue: 'upon signing', balanceDue: 'upon final delivery', notes: 'We keep the process simple: one deposit to begin, one final payment to wrap up.' };
+        section.data = { heading: 'Terms & Conditions', depositPercent: 50, depositDue: 'upon signing', balanceDue: 'upon final delivery', notes: '' };
         break;
-      case 'custom':
-        section.data = { heading: 'Custom Section', body: 'Add your own content here.', items: ['One point', 'Another point'] };
+      case 'process':
+        section.data = {
+          heading: 'Our Process',
+          steps: [
+            { id: uid(), title: 'Discovery', description: 'Align on goals, audience, and technical requirements before a single line is written.' },
+            { id: uid(), title: 'Design', description: 'Wireframes and visual design with a structured feedback round.' },
+            { id: uid(), title: 'Development', description: 'Building the final product with clean, tested code and full QA.' },
+            { id: uid(), title: 'Launch', description: 'Deployment, final QA, and complete handoff documentation.' },
+          ],
+        };
+        break;
+      case 'strategy':
+        section.data = {
+          heading: 'Strategy',
+          body: 'Our approach is built on three pillars: sharp positioning, channel-specific creative, and data-driven iteration. Every tactic ladders up to a single measurable goal.',
+          pillars: ['Brand positioning', 'Performance creative', 'Paid media', 'Conversion optimisation'],
+        };
+        break;
+      case 'kpis':
+        section.data = {
+          heading: 'KPIs & Success Metrics',
+          items: [
+            { id: uid(), metric: 'Qualified Leads', target: '+30/mo', description: 'Monthly qualified leads from all active channels.' },
+            { id: uid(), metric: 'Cost Per Acquisition', target: '−20%', description: 'Reduce CAC via tighter targeting and creative testing.' },
+            { id: uid(), metric: 'ROAS', target: '3×', description: 'Return on ad spend across all running campaigns.' },
+          ],
+        };
+        break;
+      case 'reporting':
+        section.data = {
+          heading: 'Reporting',
+          body: 'You get clear, concise reporting every step of the way — no dashboards to learn, no jargon to decode.',
+          cadence: ['Weekly performance summary (email)', 'Monthly analytics report (PDF)', 'Quarterly strategy review (call)'],
+        };
+        break;
+      case 'creative_direction':
+        section.data = {
+          heading: 'Creative Direction',
+          body: 'Every creative decision is guided by a single question: does this feel unmistakably like the brand? The work should feel bold but restrained — high confidence, low noise.',
+          keywords: ['Bold', 'Minimal', 'Timeless', 'Confident', 'Premium'],
+        };
         break;
     }
     return section;
@@ -326,13 +416,17 @@ function getPreviewContent(templateId: string): PreviewContent {
     },
     projectTitle: 'Proposal Preview',
     projectDescription: 'A polished, finished proposal preview with realistic content and structure.',
-    aboutBody: 'We combine strategy, design, and execution to deliver proposals that feel polished, clear, and ready to sign.',
+    aboutBody: 'We combine strategy, design, and execution to deliver work that is polished, clear, and ready to sign.',
     overviewBody: 'This engagement covers planning, creative direction, production, and final delivery with a tight feedback loop.',
-    objectives: ['Define a clear scope', 'Present a polished deliverable', 'Move quickly from approval to execution'],
-    highlights: ['Strategy-led process', 'Fast communication', 'High-quality presentation'],
+    goals: [
+      'Deliver a proposal the client can sign the same day they receive it',
+      'Keep every section focused — no filler, no fluff',
+      'Move from approval to execution within 48 hours',
+    ],
+    highlights: ['Strategy-led process', 'Fast communication', 'High-quality output'],
     scopeItems: [
       { id: uid(), title: 'Discovery and planning', description: 'Clarify goals, audience, and success metrics before production begins.' },
-      { id: uid(), title: 'Creative production', description: 'Design, build, or write the core assets that make the proposal tangible.' },
+      { id: uid(), title: 'Creative production', description: 'Design, build, or write the core assets that make the project tangible.' },
       { id: uid(), title: 'Launch support', description: 'Refine the final details and support handoff after approval.' },
     ],
     deliverables: [
@@ -349,27 +443,23 @@ function getPreviewContent(templateId: string): PreviewContent {
       { id: uid(), name: 'Rush delivery', price: 2500, description: 'Compress the timeline for urgent launches.' },
       { id: uid(), name: 'Extended support', price: 1800, description: 'Keep the team available after sign-off.' },
     ],
-    faq: [
-      { id: uid(), question: 'How long does this take?', answer: 'Most projects run in four to six weeks depending on feedback speed and scope.' },
-      { id: uid(), question: 'What happens after approval?', answer: 'We schedule kickoff, confirm milestones, and begin the first production phase right away.' },
-    ],
     testimonials: [
       { id: uid(), quote: 'The proposal felt complete from the first review and made approval easy.', author: 'M. Ellis', role: 'Marketing Director', rating: 5 },
       { id: uid(), quote: 'Clear structure, strong presentation, and zero guesswork.', author: 'R. Chen', role: 'Founder', rating: 5 },
     ],
     caseStudies: [
-      { id: uid(), project: 'Northstar Launch', problem: 'The team needed a sharper pitch to close the deal.', result: 'The proposal landed quickly and turned into a signed engagement.' },
+      { id: uid(), project: 'Northstar Launch', problem: 'The team needed a sharper pitch to close enterprise clients faster.', result: 'The campaign landed quickly and converted 3 of 4 proposals in the first month.' },
     ],
-    videoUrl: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
+    videoUrl: '',
   };
 
   switch (templateId) {
     case 'web-design':
-      return { ...base, clientName: 'Ava Patel', clientEmail: 'ava@summithealth.com', clientCompany: 'Summit Health', projectTitle: 'Website Redesign Proposal', projectDescription: 'A conversion-focused redesign that refreshes the brand, clarifies the offer, and improves lead generation.', pricingSubtotal: 22000 };
+      return { ...base, clientName: 'Ava Patel', clientEmail: 'ava@summithealth.com', clientCompany: 'Summit Health', businessName: 'Pixel & Co.', projectTitle: 'Website Redesign Proposal', projectDescription: 'A conversion-focused redesign that refreshes the brand, clarifies the offer, and improves lead generation.', pricingSubtotal: 22000 };
     case 'marketing':
       return { ...base, clientName: 'Marcus Reed', clientEmail: 'marcus@brandlift.co', clientCompany: 'BrandLift', businessName: 'Orbit Growth', projectTitle: 'Q4 Growth Campaign Proposal', projectDescription: 'A full-funnel marketing plan to sharpen positioning, launch campaigns, and improve qualified lead volume.', pricingSubtotal: 24000 };
     case 'creative':
-      return { ...base, clientName: 'Priya Shah', clientEmail: 'priya@atelier.co', clientCompany: 'Atelier Co.', businessName: 'Atelier North', projectTitle: 'Creative Campaign Proposal', projectDescription: 'A design-led concept package that gives the brand a polished, memorable presence across launch touchpoints.', pricingSubtotal: 19500 };
+      return { ...base, clientName: 'Priya Shah', clientEmail: 'priya@atelier.co', clientCompany: 'Atelier Co.', businessName: 'Atelier North', projectTitle: 'Brand Identity Proposal', projectDescription: 'A design-led concept package that gives the brand a polished, memorable presence across every touchpoint.', pricingSubtotal: 19500 };
     default:
       return base;
   }
@@ -383,23 +473,30 @@ export const SECTION_LABELS: Record<SectionType, string> = {
   hero: 'Hero',
   about: 'About Me',
   project_overview: 'Project Overview',
+  project_goals: 'Project Goals',
   scope: 'Scope of Work',
   deliverables: 'Deliverables',
   timeline: 'Timeline',
-  pricing: 'Pricing',
+  pricing: 'Investment',
   packages: 'Packages',
   addons: 'Add-ons',
   faq: 'FAQ',
   testimonials: 'Testimonials',
-  case_studies: 'Case Studies',
-  video: 'Video',
+  case_studies: 'Previous Results',
+  video: 'Video Introduction',
   terms: 'Terms & Conditions',
   accept: 'Accept & Sign',
+  process: 'Our Process',
+  strategy: 'Strategy',
+  kpis: 'KPIs & Metrics',
+  reporting: 'Reporting',
+  creative_direction: 'Creative Direction',
   custom: 'Custom Section',
 };
 
 export const ALL_SECTION_TYPES: SectionType[] = [
-  'hero', 'about', 'project_overview', 'scope', 'deliverables', 'timeline',
-  'pricing', 'packages', 'addons', 'faq', 'testimonials', 'case_studies',
-  'video', 'terms',
+  'hero', 'about', 'project_overview', 'project_goals', 'scope', 'deliverables',
+  'timeline', 'pricing', 'packages', 'addons', 'testimonials', 'case_studies',
+  'video', 'terms', 'accept', 'process', 'strategy', 'kpis', 'reporting',
+  'creative_direction', 'faq', 'custom',
 ];

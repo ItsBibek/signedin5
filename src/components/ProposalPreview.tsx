@@ -183,16 +183,6 @@ function SectionRenderer({
             <h2 className={headingClass}>{(d.heading as string) || 'Project Overview'}</h2>
           </div>
           <p className="max-w-2xl text-base leading-relaxed text-neutral-600">{d.body as string}</p>
-          {Array.isArray(d.objectives) && (d.objectives as string[]).length > 0 && (
-            <ul className="mt-6 space-y-2">
-              {(d.objectives as string[]).map((o, i) => (
-                <li key={i} className="flex items-start gap-2 text-sm text-neutral-700">
-                  <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full" style={{ backgroundColor: accent }} />
-                  {o}
-                </li>
-              ))}
-            </ul>
-          )}
         </div>
       );
 
@@ -568,6 +558,138 @@ function SectionRenderer({
                   <span className="mt-1 h-2 w-2 rounded-full" style={{ backgroundColor: accent }} />
                   <span>{item}</span>
                 </div>
+              ))}
+            </div>
+          )}
+        </div>
+      );
+
+    case 'project_goals':
+      return (
+        <div className={wrapperClass}>
+          <div className={titleClass}>
+            <span className="h-4 w-1 rounded-full" style={{ backgroundColor: accent }} />
+            <h2 className={headingClass}>{(d.heading as string) || 'Project Goals'}</h2>
+          </div>
+          <ul className="space-y-3">
+            {Array.isArray(d.items) && (d.items as string[]).map((goal, i) => (
+              <li key={i} className="flex items-start gap-3">
+                <span className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-xs font-semibold text-white" style={{ backgroundColor: accent }}>{i + 1}</span>
+                <span className="text-sm leading-relaxed text-neutral-700">{goal}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      );
+
+    case 'process': {
+      const steps = (d.steps as { id: string; title: string; description: string }[]) || [];
+      return (
+        <div className={wrapperClass}>
+          <div className={titleClass}>
+            <span className="h-4 w-1 rounded-full" style={{ backgroundColor: accent }} />
+            <h2 className={headingClass}>{(d.heading as string) || 'Our Process'}</h2>
+          </div>
+          <div className="space-y-0">
+            {steps.map((step, i) => (
+              <div key={step.id || i} className="flex gap-4">
+                <div className="flex flex-col items-center">
+                  <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-sm font-semibold text-white" style={{ backgroundColor: accent }}>{i + 1}</div>
+                  {i < steps.length - 1 && <div className="my-1 w-0.5 flex-1 bg-neutral-200" />}
+                </div>
+                <div className="pb-6">
+                  <div className="font-semibold text-neutral-900">{step.title}</div>
+                  {step.description && <p className="mt-1 text-sm leading-relaxed text-neutral-500">{step.description}</p>}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      );
+    }
+
+    case 'strategy':
+      return (
+        <div className={wrapperClass}>
+          <div className={titleClass}>
+            <span className="h-4 w-1 rounded-full" style={{ backgroundColor: accent }} />
+            <h2 className={headingClass}>{(d.heading as string) || 'Strategy'}</h2>
+          </div>
+          {(d.body as string) && (
+            <p className="max-w-2xl text-base leading-relaxed text-neutral-600">{d.body as string}</p>
+          )}
+          {Array.isArray(d.pillars) && (d.pillars as string[]).length > 0 && (
+            <div className="mt-5 flex flex-wrap gap-2">
+              {(d.pillars as string[]).map((pillar, i) => (
+                <span key={i} className="rounded-lg px-3 py-1.5 text-sm font-medium text-white" style={{ backgroundColor: accent }}>
+                  {pillar}
+                </span>
+              ))}
+            </div>
+          )}
+        </div>
+      );
+
+    case 'kpis': {
+      const kpiItems = (d.items as { id: string; metric: string; target: string; description: string }[]) || [];
+      return (
+        <div className={wrapperClass}>
+          <div className={titleClass}>
+            <span className="h-4 w-1 rounded-full" style={{ backgroundColor: accent }} />
+            <h2 className={headingClass}>{(d.heading as string) || 'KPIs & Success Metrics'}</h2>
+          </div>
+          <div className="grid gap-4 sm:grid-cols-3">
+            {kpiItems.map((item, i) => (
+              <div key={item.id || i} className="rounded-xl border border-neutral-200 bg-neutral-50/50 p-4">
+                <div className="text-2xl font-bold tabular-nums" style={{ color: accent }}>{item.target}</div>
+                <div className="mt-1 font-semibold text-neutral-900">{item.metric}</div>
+                {item.description && <p className="mt-1 text-xs leading-relaxed text-neutral-500">{item.description}</p>}
+              </div>
+            ))}
+          </div>
+        </div>
+      );
+    }
+
+    case 'reporting':
+      return (
+        <div className={wrapperClass}>
+          <div className={titleClass}>
+            <span className="h-4 w-1 rounded-full" style={{ backgroundColor: accent }} />
+            <h2 className={headingClass}>{(d.heading as string) || 'Reporting'}</h2>
+          </div>
+          {(d.body as string) && <p className="max-w-2xl text-base leading-relaxed text-neutral-600">{d.body as string}</p>}
+          {Array.isArray(d.cadence) && (d.cadence as string[]).length > 0 && (
+            <ul className="mt-5 space-y-2">
+              {(d.cadence as string[]).map((item, i) => (
+                <li key={i} className="flex items-center gap-3 text-sm text-neutral-700">
+                  <span className="h-1.5 w-1.5 shrink-0 rounded-full" style={{ backgroundColor: accent }} />
+                  {item}
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+      );
+
+    case 'creative_direction':
+      return (
+        <div className={wrapperClass}>
+          <div className={titleClass}>
+            <span className="h-4 w-1 rounded-full" style={{ backgroundColor: accent }} />
+            <h2 className={headingClass}>{(d.heading as string) || 'Creative Direction'}</h2>
+          </div>
+          {(d.body as string) && (
+            <p className="max-w-2xl border-l-2 pl-4 text-base italic leading-relaxed text-neutral-600" style={{ borderColor: accent }}>
+              {d.body as string}
+            </p>
+          )}
+          {Array.isArray(d.keywords) && (d.keywords as string[]).length > 0 && (
+            <div className="mt-5 flex flex-wrap gap-2">
+              {(d.keywords as string[]).map((kw, i) => (
+                <span key={i} className="rounded-full border border-neutral-200 bg-white px-3 py-1 text-sm font-medium text-neutral-700">
+                  {kw}
+                </span>
               ))}
             </div>
           )}
