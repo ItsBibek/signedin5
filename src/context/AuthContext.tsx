@@ -2,6 +2,7 @@ import { createContext, useContext, useEffect, useState, type ReactNode } from '
 import type { Session, User } from '@supabase/supabase-js';
 import { supabase } from '@/lib/supabase';
 import type { Profile } from '@/types/database';
+import { validateEmailProvider } from '@/lib/emailValidation';
 
 interface AuthContextValue {
   session: Session | null;
@@ -74,10 +75,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     profile,
     loading,
     async signIn(email, password) {
+      const validation = validateEmailProvider(email);
+      if (!validation.isValid) {
+        return { error: validation.error };
+      }
       const { error } = await supabase.auth.signInWithPassword({ email, password });
       return { error: error ? error.message : null };
     },
     async signUp(email, password) {
+      const validation = validateEmailProvider(email);
+      if (!validation.isValid) {
+        return { error: validation.error };
+      }
       const { error } = await supabase.auth.signUp({ email, password });
       return { error: error ? error.message : null };
     },

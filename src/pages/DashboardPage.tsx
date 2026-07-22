@@ -153,7 +153,7 @@ export function DashboardPage() {
                     </span>
                   </div>
                   <div className="mt-0.5 truncate text-xs text-neutral-500">
-                    {p.client_name || 'No client'} · {formatCurrency(p.total_value, p.currency)} · {relativeTime(p.updated_at)}
+                    {p.client_name || 'No client'} {p.client_email ? `(${p.client_email})` : ''} · {formatCurrency(p.total_value, p.currency)} · {relativeTime(p.updated_at)}
                   </div>
                 </div>
               </Link>

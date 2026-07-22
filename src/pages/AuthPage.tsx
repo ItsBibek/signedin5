@@ -1,12 +1,13 @@
 import { useState, type FormEvent } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
-import { ArrowLeft, Loader2 } from 'lucide-react';
+import { ArrowLeft, Loader2, AlertCircle } from 'lucide-react';
 import { Logo } from '@/components/Logo';
 import { useAuth } from '@/context/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
+import { validateEmailProvider } from '@/lib/emailValidation';
 
 export function AuthPage() {
   const [params] = useSearchParams();
@@ -16,10 +17,24 @@ export function AuthPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
+  const [emailError, setEmailError] = useState<string | null>(null);
+
+  function handleEmailChange(val: string) {
+    setEmail(val);
+    if (emailError) setEmailError(null);
+  }
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
     if (!email || !password) return;
+
+    const validation = validateEmailProvider(email);
+    if (!validation.isValid) {
+      setEmailError(validation.error);
+      toast.error(validation.error);
+      return;
+    }
+
     setLoading(true);
     const fn = mode === 'signup' ? signUp : signIn;
     const { error } = await fn(email, password);
@@ -63,10 +78,23 @@ export function AuthPage() {
                   type="email"
                   placeholder="you@studio.com"
                   value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  onChange={(e) => handleEmailChange(e.target.value)}
+                  onBlur={() => {
+                    if (email) {
+                      const res = validateEmailProvider(email);
+                      if (!res.isValid) setEmailError(res.error);
+                    }
+                  }}
                   required
                   autoComplete="email"
+                  className={emailError ? 'border-red-500 focus-visible:ring-red-500' : ''}
                 />
+                {emailError && (
+                  <div className="flex items-start gap-1.5 text-xs text-red-600">
+                    <AlertCircle className="h-3.5 w-3.5 shrink-0 mt-0.5" />
+                    <span>{emailError}</span>
+                  </div>
+                )}
               </div>
               <div className="space-y-2">
                 <Label htmlFor="password">Password</Label>

@@ -116,7 +116,7 @@ export function ProposalDetailPage() {
             </div>
           </div>
           <p className="text-sm text-neutral-500">
-            {proposal.client_name || 'No client'} · {formatCurrency(proposal.total_value, proposal.currency)} · Updated {relativeTime(proposal.updated_at)}
+            {proposal.client_name || 'No client'} {proposal.client_email ? `(${proposal.client_email})` : ''} · {formatCurrency(proposal.total_value, proposal.currency)} · Updated {relativeTime(proposal.updated_at)}
           </p>
         </div>
         <div className="flex flex-wrap gap-2 sm:justify-end">
