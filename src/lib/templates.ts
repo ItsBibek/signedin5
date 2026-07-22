@@ -21,7 +21,7 @@ export const TEMPLATES: TemplateDef[] = [
     accent: '#0a0a0a',
     layout: 'classic',
     font: 'inter',
-    sections: ['hero', 'project_overview', 'scope', 'timeline', 'pricing', 'terms', 'accept'],
+    sections: ['hero', 'project_overview', 'scope', 'timeline', 'pricing', 'terms'],
   },
   {
     id: 'web-design',
@@ -31,7 +31,7 @@ export const TEMPLATES: TemplateDef[] = [
     accent: '#2563eb',
     layout: 'modern',
     font: 'inter',
-    sections: ['hero', 'about', 'project_overview', 'scope', 'deliverables', 'timeline', 'packages', 'addons', 'faq', 'accept'],
+    sections: ['hero', 'about', 'project_overview', 'scope', 'deliverables', 'timeline', 'packages', 'addons', 'faq'],
   },
   {
     id: 'marketing',
@@ -41,7 +41,7 @@ export const TEMPLATES: TemplateDef[] = [
     accent: '#d97706',
     layout: 'bold',
     font: 'inter',
-    sections: ['hero', 'about', 'project_overview', 'scope', 'case_studies', 'packages', 'addons', 'timeline', 'accept'],
+    sections: ['hero', 'about', 'project_overview', 'scope', 'case_studies', 'packages', 'addons', 'timeline'],
   },
   {
     id: 'creative',
@@ -51,7 +51,7 @@ export const TEMPLATES: TemplateDef[] = [
     accent: '#db2777',
     layout: 'editorial',
     font: 'serif',
-    sections: ['hero', 'about', 'project_overview', 'scope', 'deliverables', 'testimonials', 'pricing', 'faq', 'accept'],
+    sections: ['hero', 'about', 'project_overview', 'scope', 'deliverables', 'testimonials', 'pricing', 'faq'],
   },
 ];
 
@@ -212,6 +212,7 @@ export function buildDefaultSection(type: SectionType): Section {
     video: { title: 'Video Introduction', data: { heading: 'Video Introduction', url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ' } },
     terms: { title: 'Terms & Conditions', data: { heading: 'Terms & Conditions', depositPercent: 50, depositDue: 'upon signing', balanceDue: 'upon completion', notes: 'Add your terms here.' } },
     accept: { title: 'Accept & Sign', data: { heading: 'Accept & Sign', body: 'Use this section to confirm the next step.' } },
+    custom: { title: 'Custom Section', data: { heading: 'Custom Section', body: 'Add your own content here.', items: [] } },
   };
 
   const defaultsForType = defaults[type];
@@ -291,8 +292,8 @@ function buildPreviewSections(templateId: string, content: PreviewContent): Sect
       case 'terms':
         section.data = { heading: 'Payment Terms', depositPercent: 50, depositDue: 'upon signing', balanceDue: 'upon final delivery', notes: 'We keep the process simple: one deposit to begin, one final payment to wrap up.' };
         break;
-      case 'accept':
-        section.data = { heading: 'Ready to move forward?', body: 'Approve this proposal and we will begin the next step immediately.' };
+      case 'custom':
+        section.data = { heading: 'Custom Section', body: 'Add your own content here.', items: ['One point', 'Another point'] };
         break;
     }
     return section;
@@ -394,10 +395,11 @@ export const SECTION_LABELS: Record<SectionType, string> = {
   video: 'Video',
   terms: 'Terms & Conditions',
   accept: 'Accept & Sign',
+  custom: 'Custom Section',
 };
 
 export const ALL_SECTION_TYPES: SectionType[] = [
   'hero', 'about', 'project_overview', 'scope', 'deliverables', 'timeline',
   'pricing', 'packages', 'addons', 'faq', 'testimonials', 'case_studies',
-  'video', 'terms', 'accept',
+  'video', 'terms',
 ];

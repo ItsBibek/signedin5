@@ -68,9 +68,30 @@ export function SettingsPage() {
           </div>
 
           <div className="space-y-1.5">
-            <Label className="text-sm font-medium">Logo URL</Label>
-            <Input value={logoUrl} onChange={(e) => setLogoUrl(e.target.value)} placeholder="https://.../logo.png" />
-            <p className="text-xs text-neutral-400">Paste a link to your logo image. PNG or SVG recommended.</p>
+            <Label className="text-sm font-medium">Logo</Label>
+            <div className="space-y-2 rounded-xl border border-neutral-200 bg-white p-3">
+              <div className="space-y-1.5">
+                <Label className="text-xs font-medium text-neutral-500">Upload from computer</Label>
+                <Input
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (!file) return;
+                    const reader = new FileReader();
+                    reader.onload = () => {
+                      setLogoUrl(typeof reader.result === 'string' ? reader.result : '');
+                    };
+                    reader.readAsDataURL(file);
+                  }}
+                />
+              </div>
+              <div className="space-y-1.5">
+                <Label className="text-xs font-medium text-neutral-500">Or paste a link</Label>
+                <Input value={logoUrl} onChange={(e) => setLogoUrl(e.target.value)} placeholder="https://.../logo.png" />
+              </div>
+              <p className="text-xs text-neutral-400">Use either an uploaded file or a direct image link. The saved value is stored in your profile.</p>
+            </div>
           </div>
 
           <div className="space-y-2">

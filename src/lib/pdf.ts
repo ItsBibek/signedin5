@@ -23,38 +23,28 @@ export async function downloadProposalPDF(proposal: Proposal, signature?: Signat
       logging: false,
     });
 
-    const imgWidth = 800;
-    const imgHeight = canvas.height * imgWidth / canvas.width;
-    const pageHeight = 1122; // A4 at ~96dpi
-    let heightLeft = imgHeight;
-    let position = 0;
-
     const pdf = new jsPDF('p', 'px', 'a4');
     const pdfWidth = pdf.internal.pageSize.getWidth();
     const pdfHeight = pdf.internal.pageSize.getHeight();
-    const scaledWidth = pdfWidth;
-    const scaledHeight = canvas.height * scaledWidth / canvas.width;
+    const pageCanvas = document.createElement('canvas');
+    const ctx = pageCanvas.getContext('2d');
+    if (!ctx) throw new Error('Unable to render PDF page');
 
-    // Add pages
-    let yOffset = 0;
-    while (yOffset < scaledHeight) {
-      const pageCanvas = document.createElement('canvas');
+    const sourcePageHeight = Math.floor((canvas.width * pdfHeight) / pdfWidth);
+    const totalPages = Math.max(1, Math.ceil(canvas.height / sourcePageHeight));
+
+    for (let pageIndex = 0; pageIndex < totalPages; pageIndex += 1) {
+      const sourceY = pageIndex * sourcePageHeight;
+      const sourceHeight = Math.min(sourcePageHeight, canvas.height - sourceY);
       pageCanvas.width = canvas.width;
-      pageCanvas.height = Math.min(canvas.height - (yOffset * canvas.width / scaledWidth), canvas.height);
-      const ctx = pageCanvas.getContext('2d');
-      if (!ctx) break;
-
-      // Draw the portion of the canvas for this page
-      const sourceY = yOffset * canvas.width / scaledWidth;
-      const sourceHeight = Math.min(pageHeight * canvas.width / pdfWidth, canvas.height - sourceY);
       pageCanvas.height = sourceHeight;
+      ctx.clearRect(0, 0, pageCanvas.width, pageCanvas.height);
       ctx.drawImage(canvas, 0, sourceY, canvas.width, sourceHeight, 0, 0, canvas.width, sourceHeight);
 
       const pageImgData = pageCanvas.toDataURL('image/jpeg', 0.95);
-      if (yOffset > 0) pdf.addPage();
-      pdf.addImage(pageImgData, 'JPEG', 0, 0, pdfWidth, pageCanvas.height * pdfWidth / canvas.width);
-
-      yOffset += pageHeight;
+      if (pageIndex > 0) pdf.addPage();
+      const renderedHeight = (sourceHeight * pdfWidth) / canvas.width;
+      pdf.addImage(pageImgData, 'JPEG', 0, 0, pdfWidth, renderedHeight);
     }
 
     const fileName = `${(proposal.project_title || 'proposal').replace(/[^a-z0-9]/gi, '-').toLowerCase()}-${signature ? 'signed' : 'proposal'}.pdf`;
@@ -252,6 +242,17 @@ function renderSection(section: { type: string; data: Record<string, unknown>; t
         <h2 style="font-size:20px;font-weight:600;color:#111;margin:0;">${esc((d.heading as string) || 'Ready to proceed?')}</h2>
         <p style="margin-top:8px;font-size:14px;color:#666;">${esc((d.body as string) || 'By signing this proposal, you agree to the scope, timeline, and terms outlined above.')}</p>
       </div>`;
+
+    case 'custom': {
+      const items = Array.isArray(d.items) ? (d.items as string[]) : [];
+      return `<div>${titleBar}
+        ${(d.body as string) ? `<p style="max-width:600px;color:#555;">${esc(d.body as string)}</p>` : ''}
+        ${items.length > 0 ? `<ul style="margin-top:16px;padding:0;list-style:none;">${items.map((item) => `
+          <li style="display:flex;align-items:start;gap:8px;font-size:14px;color:#444;margin-bottom:8px;">
+            <span style="margin-top:6px;width:6px;height:6px;border-radius:50%;background:${accent};flex-shrink:0;"></span>${esc(item)}
+          </li>`).join('')}</ul>` : ''}
+      </div>`;
+    }
 
     default:
       return '';

@@ -24,6 +24,16 @@ export async function fetchProposal(id: string): Promise<Proposal | null> {
 
 export async function createProposalDraft(templateId: string): Promise<Proposal> {
   const sections = buildSectionsForTemplate(templateId);
+  const { data: userData } = await supabase.auth.getUser();
+  let profile: { business_name: string | null; logo_url: string | null; brand_color: string | null } | null = null;
+  if (userData.user) {
+    const { data } = await supabase
+      .from('profiles')
+      .select('business_name, logo_url, brand_color')
+      .eq('id', userData.user.id)
+      .maybeSingle();
+    profile = data;
+  }
   const { data, error } = await supabase
     .from('proposals')
     .insert({
@@ -38,7 +48,11 @@ export async function createProposalDraft(templateId: string): Promise<Proposal>
       pricing: { items: [], subtotal: 0, taxRate: 0, tax: 0, total: 0 },
       timeline: { startDate: '', endDate: '', milestones: [] },
       payment_terms: { depositPercent: 50, depositDue: 'upon signing', balanceDue: 'upon completion', notes: 'Add payment terms here.' },
-      branding: { business_name: 'Your business', logo_url: null, brand_color: '#0a0a0a' },
+      branding: {
+        business_name: profile?.business_name || 'Your business',
+        logo_url: profile?.logo_url || null,
+        brand_color: profile?.brand_color || '#0a0a0a',
+      },
       total_value: 0,
       template_id: templateId,
       sections: sections,

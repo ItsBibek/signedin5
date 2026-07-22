@@ -553,6 +553,27 @@ function SectionRenderer({
         </div>
       );
 
+    case 'custom':
+      return (
+        <div className={wrapperClass}>
+          <div className={titleClass}>
+            <span className="h-4 w-1 rounded-full" style={{ backgroundColor: accent }} />
+            <h2 className={headingClass}>{(d.heading as string) || 'Custom Section'}</h2>
+          </div>
+          {(d.body as string) && <p className="max-w-2xl text-sm leading-relaxed text-neutral-600">{d.body as string}</p>}
+          {Array.isArray(d.items) && (d.items as string[]).length > 0 && (
+            <div className="mt-4 space-y-2 text-sm text-neutral-600">
+              {(d.items as string[]).map((item) => (
+                <div key={item} className="flex items-start gap-2">
+                  <span className="mt-1 h-2 w-2 rounded-full" style={{ backgroundColor: accent }} />
+                  <span>{item}</span>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      );
+
     default:
       return null;
   }

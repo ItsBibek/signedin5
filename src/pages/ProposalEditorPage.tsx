@@ -106,6 +106,23 @@ export function ProposalEditorPage() {
     });
   }
 
+  function syncProjectTitle(title: string) {
+    setProposal((prev) => {
+      if (!prev) return prev;
+      const next = {
+        ...prev,
+        project_title: title,
+        sections: prev.sections.map((section) => (
+          section.type === 'hero'
+            ? { ...section, data: { ...section.data, headline: title } }
+            : section
+        )),
+      };
+      scheduleSave(next);
+      return next;
+    });
+  }
+
   function updateSections(sections: Section[]) {
     patch({ sections });
   }
@@ -133,6 +150,19 @@ export function ProposalEditorPage() {
 
   function addSection(type: SectionType) {
     const newSection = buildDefaultSection(type);
+    updateSections([...proposal!.sections, newSection]);
+    setActiveSectionId(newSection.id);
+    setShowAddSection(false);
+  }
+
+  function addCustomSection() {
+    const newSection: Section = {
+      id: uid(),
+      type: 'custom',
+      title: 'Custom Section',
+      enabled: true,
+      data: { heading: 'Custom Section', body: 'Add your own content here.', items: ['First point', 'Second point'] },
+    };
     updateSections([...proposal!.sections, newSection]);
     setActiveSectionId(newSection.id);
     setShowAddSection(false);
@@ -211,7 +241,7 @@ export function ProposalEditorPage() {
           <span className="hidden text-sm text-neutral-400 sm:inline">/</span>
           <Input
             value={proposal.project_title}
-            onChange={(e) => patch({ project_title: e.target.value })}
+            onChange={(e) => syncProjectTitle(e.target.value)}
             placeholder="Untitled proposal"
             className="h-8 w-32 border-0 px-1 text-sm font-medium focus-visible:ring-1 sm:w-48"
             disabled={readOnly}
@@ -236,7 +266,7 @@ export function ProposalEditorPage() {
 
       {/* Section nav bar — sticky under top bar */}
       <div className="sticky top-28 z-20 border-b border-neutral-200 bg-white/95 backdrop-blur-md">
-        <div className="flex items-center gap-1.5 overflow-x-auto px-4 py-2 md:px-8 scrollbar-thin">
+      <div className="flex flex-wrap items-center gap-2 px-4 py-2 md:px-8">
           {proposal.sections.map((s) => (
             <button
               key={s.id}
@@ -259,18 +289,23 @@ export function ProposalEditorPage() {
               </Button>
               {showAddSection && (
                 <Card className="absolute left-0 top-10 z-30 w-52 border-neutral-200 p-1.5 shadow-lg">
-                  <div className="max-h-72 overflow-y-auto">
-                    {ALL_SECTION_TYPES.filter((t) => !proposal.sections.some((s) => s.type === t)).map((type) => (
-                      <button
-                        key={type}
-                        onClick={() => addSection(type)}
-                        className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm text-neutral-700 hover:bg-neutral-100"
-                      >
-                        <Plus className="h-3.5 w-3.5 text-neutral-400" />
-                        {SECTION_LABELS[type]}
-                      </button>
-                    ))}
-                  </div>
+                  {ALL_SECTION_TYPES.filter((t) => !proposal.sections.some((s) => s.type === t)).map((type) => (
+                    <button
+                      key={type}
+                      onClick={() => addSection(type)}
+                      className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm text-neutral-700 hover:bg-neutral-100"
+                    >
+                      <Plus className="h-3.5 w-3.5 text-neutral-400" />
+                      {SECTION_LABELS[type]}
+                    </button>
+                  ))}
+                  <button
+                    onClick={addCustomSection}
+                    className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm text-neutral-700 hover:bg-neutral-100"
+                  >
+                    <Plus className="h-3.5 w-3.5 text-neutral-400" />
+                    Custom section
+                  </button>
                 </Card>
               )}
             </div>
@@ -281,6 +316,9 @@ export function ProposalEditorPage() {
       <div className="px-4 py-4 lg:px-10 xl:px-14">
         {/* Client info bar */}
         <Card className="mb-4 border-neutral-200 p-4">
+          <div className="mb-4 rounded-xl border border-dashed border-neutral-200 bg-neutral-50 px-4 py-3 text-sm text-neutral-500">
+            Branding is managed in Settings. Update your logo or brand color there, then it will sync here automatically.
+          </div>
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
             <div>
               <Label className="text-xs text-neutral-400">Client name</Label>
@@ -312,6 +350,7 @@ export function ProposalEditorPage() {
                   proposal={proposal}
                   readOnly={readOnly}
                   onUpdate={(data) => updateSection(activeSection.id, data)}
+                  onProposalUpdate={(updates) => patch(updates)}
                 />
                 {/* Section footer actions */}
                 {!readOnly && (
@@ -369,12 +408,13 @@ export function ProposalEditorPage() {
 /* ---------- Section Editor ---------- */
 
 function SectionEditor({
-  section, proposal, readOnly, onUpdate,
+  section, proposal, readOnly, onUpdate, onProposalUpdate,
 }: {
   section: Section;
   proposal: Proposal;
   readOnly: boolean;
   onUpdate: (data: Record<string, unknown>) => void;
+  onProposalUpdate: (data: Partial<Proposal>) => void;
 }) {
   const d = section.data;
   const accent = proposal.branding?.brand_color || '#0a0a0a';
@@ -385,7 +425,15 @@ function SectionEditor({
         <Card className="border-neutral-200 p-5">
           <EditorHeader title="Hero Section" />
           <Field label="Headline">
-            <Input value={(d.headline as string) || ''} onChange={(e) => onUpdate({ headline: e.target.value })} placeholder="Your Project Title" disabled={readOnly} />
+            <Input
+              value={(d.headline as string) || ''}
+              onChange={(e) => {
+                onUpdate({ headline: e.target.value });
+                onProposalUpdate({ project_title: e.target.value });
+              }}
+              placeholder="Your Project Title"
+              disabled={readOnly}
+            />
           </Field>
           <Field label="Subheadline">
             <Textarea value={(d.subheadline as string) || ''} onChange={(e) => onUpdate({ subheadline: e.target.value })} placeholder="A brief, compelling one-liner" rows={3} disabled={readOnly} />
@@ -787,7 +835,7 @@ function SectionEditor({
               <Input type="number" min={0} max={100} value={(d.depositPercent as number) || 0} onChange={(e) => onUpdate({ depositPercent: +e.target.value })} disabled={readOnly} />
             </Field>
             <Field label="Currency">
-              <Input value={proposal.currency} onChange={(e) => patchCurrency(proposal, onUpdate)} placeholder="USD" disabled={readOnly} />
+              <Input value={proposal.currency} onChange={(e) => onProposalUpdate({ currency: e.target.value })} placeholder="USD" disabled={readOnly} />
             </Field>
           </div>
           <div className="grid gap-3 sm:grid-cols-2">
@@ -817,15 +865,27 @@ function SectionEditor({
         </Card>
       );
 
+    case 'custom': {
+      const items = Array.isArray(d.items) ? (d.items as string[]) : [];
+      return (
+        <Card className="border-neutral-200 p-5">
+          <EditorHeader title="Custom Section" />
+          <Field label="Heading">
+            <Input value={(d.heading as string) || ''} onChange={(e) => onUpdate({ heading: e.target.value })} disabled={readOnly} />
+          </Field>
+          <Field label="Body">
+            <Textarea value={(d.body as string) || ''} onChange={(e) => onUpdate({ body: e.target.value })} rows={4} disabled={readOnly} />
+          </Field>
+          <Field label="Items (one per line)">
+            <Textarea value={items.join('\n')} onChange={(e) => onUpdate({ items: e.target.value.split('\n').filter(Boolean) })} rows={4} disabled={readOnly} />
+          </Field>
+        </Card>
+      );
+    }
+
     default:
       return <Card className="p-5 text-sm text-neutral-400">Unknown section type</Card>;
   }
-}
-
-function patchCurrency(proposal: Proposal, onUpdate: (data: Record<string, unknown>) => void) {
-  return (e: React.ChangeEvent<HTMLInputElement>) => {
-    // Currency is on proposal level, not section — handled by parent
-  };
 }
 
 function EditorHeader({ title }: { title: string }) {

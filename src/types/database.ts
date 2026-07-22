@@ -81,7 +81,8 @@ export type SectionType =
   | 'case_studies'
   | 'video'
   | 'terms'
-  | 'accept';
+  | 'accept'
+  | 'custom';
 
 export interface Section {
   id: string;

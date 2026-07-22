@@ -13,6 +13,7 @@ export function TemplatesPage() {
   const navigate = useNavigate();
   const [creating, setCreating] = useState<string | null>(null);
   const [previewTemplate, setPreviewTemplate] = useState<TemplateDef | null>(null);
+  const visibleTemplates = TEMPLATES.filter((template) => template.id !== 'creative');
 
   async function handleSelect(tmpl: TemplateDef) {
     setCreating(tmpl.id);
@@ -36,7 +37,7 @@ export function TemplatesPage() {
       </div>
 
       <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-        {TEMPLATES.map((tmpl) => (
+        {visibleTemplates.map((tmpl) => (
           <Card
             key={tmpl.id}
             className="group flex flex-col overflow-hidden border-neutral-200 p-0 transition-all hover:shadow-lg"
