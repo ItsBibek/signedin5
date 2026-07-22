@@ -81,7 +81,7 @@ export function ProposalPreview({
         layout === 'bold' && 'bg-neutral-900 text-neutral-400 border-neutral-800',
       )}>
         <p className={cn('text-sm leading-relaxed', layout === 'bold' ? 'text-neutral-400' : 'text-neutral-500')}>
-          This proposal is valid for 30 days. To accept, click the "Accept &amp; Sign" button.
+          To accept this proposal, click the "Accept &amp; Sign" button.
         </p>
         {proposal.branding?.business_name && (
           <p className={cn('mt-4 text-xs', layout === 'bold' ? 'text-neutral-500' : 'text-neutral-400')}>
