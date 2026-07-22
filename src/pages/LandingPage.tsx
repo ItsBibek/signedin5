@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom';
 import { ArrowRight, Check, FileText, Eye, PenLine, Clock, Bell, Shield } from 'lucide-react';
 import { Logo } from '@/components/Logo';
 import { Button } from '@/components/ui/button';
+import { useAuth } from '@/context/AuthContext';
 
 const features = [
   { icon: FileText, title: 'Guided proposal wizard', desc: 'Create a complete, professional proposal in under five minutes with a simple step-by-step flow.' },
@@ -19,6 +20,8 @@ const steps = [
 ];
 
 export function LandingPage() {
+  const { user } = useAuth();
+
   return (
     <div className="min-h-screen bg-white">
       {/* Nav */}
@@ -26,12 +29,22 @@ export function LandingPage() {
         <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 md:px-8">
           <Logo />
           <div className="flex items-center gap-2">
-            <Link to="/auth">
-              <Button variant="ghost" size="sm" className="text-neutral-600">Sign in</Button>
-            </Link>
-            <Link to="/auth?mode=signup">
-              <Button size="sm">Get started</Button>
-            </Link>
+            {user ? (
+              <Link to="/dashboard">
+                <Button size="sm" className="gap-1.5">
+                  Go to Dashboard <ArrowRight className="h-4 w-4" />
+                </Button>
+              </Link>
+            ) : (
+              <>
+                <Link to="/auth">
+                  <Button variant="ghost" size="sm" className="text-neutral-600">Sign in</Button>
+                </Link>
+                <Link to="/auth?mode=signup">
+                  <Button size="sm">Get started</Button>
+                </Link>
+              </>
+            )}
           </div>
         </div>
       </header>
@@ -51,16 +64,28 @@ export function LandingPage() {
               SignedIn5 is the fastest way for solo freelancers to create, send, and track professional proposals — and get them signed without the chase.
             </p>
             <div className="mt-8 flex items-center justify-center gap-3">
-              <Link to="/auth?mode=signup">
-                <Button size="lg" className="gap-2">
-                  Start free <ArrowRight className="h-4 w-4" />
-                </Button>
-              </Link>
-              <Link to="/auth">
-                <Button size="lg" variant="outline">Sign in</Button>
-              </Link>
+              {user ? (
+                <Link to="/dashboard">
+                  <Button size="lg" className="gap-2">
+                    Go to Dashboard <ArrowRight className="h-4 w-4" />
+                  </Button>
+                </Link>
+              ) : (
+                <>
+                  <Link to="/auth?mode=signup">
+                    <Button size="lg" className="gap-2">
+                      Start free <ArrowRight className="h-4 w-4" />
+                    </Button>
+                  </Link>
+                  <Link to="/auth">
+                    <Button size="lg" variant="outline">Sign in</Button>
+                  </Link>
+                </>
+              )}
             </div>
-            <p className="mt-4 text-xs text-neutral-400">No credit card required. Free forever for solo use.</p>
+            <p className="mt-4 text-xs text-neutral-400">
+              {user ? 'Welcome back! Ready to send your next proposal?' : 'No credit card required. Free forever for solo use.'}
+            </p>
           </div>
 
           {/* Hero visual */}
@@ -152,11 +177,19 @@ export function LandingPage() {
         <div className="mx-auto max-w-4xl px-4 py-20 text-center md:px-8">
           <h2 className="text-balance text-3xl font-semibold tracking-tight md:text-4xl">Stop chasing. Start closing.</h2>
           <p className="mx-auto mt-4 max-w-lg text-neutral-400">Create your first proposal in minutes. Your clients will thank you.</p>
-          <Link to="/auth?mode=signup" className="mt-8 inline-block">
-            <Button size="lg" variant="secondary" className="gap-2">
-              Get started free <ArrowRight className="h-4 w-4" />
-            </Button>
-          </Link>
+          {user ? (
+            <Link to="/dashboard" className="mt-8 inline-block">
+              <Button size="lg" variant="secondary" className="gap-2">
+                Go to Dashboard <ArrowRight className="h-4 w-4" />
+              </Button>
+            </Link>
+          ) : (
+            <Link to="/auth?mode=signup" className="mt-8 inline-block">
+              <Button size="lg" variant="secondary" className="gap-2">
+                Get started free <ArrowRight className="h-4 w-4" />
+              </Button>
+            </Link>
+          )}
           <div className="mt-8 flex items-center justify-center gap-6 text-xs text-neutral-500">
             {['No credit card', 'Free forever', 'Unlimited drafts'].map((t) => (
               <div key={t} className="flex items-center gap-1.5">
