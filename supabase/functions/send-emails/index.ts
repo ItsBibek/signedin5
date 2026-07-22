@@ -201,13 +201,18 @@ function json(data: unknown, status = 200) {
 
 function getBaseUrl(url: URL): string {
   const envUrl = Deno.env.get("APP_BASE_URL");
-  if (envUrl) return envUrl.replace(/\/$/, "");
-  return url.origin;
+  if (envUrl && !envUrl.includes("supabase.co")) return envUrl.replace(/\/$/, "");
+  if (url && url.origin && !url.origin.includes("supabase.co") && url.origin.startsWith("https://")) {
+    return url.origin.replace(/\/$/, "");
+  }
+  return "https://signedin5.vercel.app";
 }
 
-// Prefer the app_base_url passed from the client, then the env var, then fall back to url.origin.
+// Prefer the app_base_url passed from the client, then the env var, then default to https://signedin5.vercel.app.
 function resolveBaseUrl(url: URL, appBaseUrl?: string): string {
-  if (appBaseUrl) return appBaseUrl.replace(/\/$/, "");
+  if (appBaseUrl && !appBaseUrl.includes("supabase.co") && appBaseUrl.startsWith("http")) {
+    return appBaseUrl.replace(/\/$/, "");
+  }
   return getBaseUrl(url);
 }
 
