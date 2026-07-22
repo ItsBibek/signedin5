@@ -97,17 +97,17 @@ export function ProposalDetailPage() {
   }
 
   return (
-    <div>
+    <div className="mx-auto w-full max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
       <div className="mb-6 flex items-center gap-3">
         <Button variant="ghost" size="sm" onClick={() => navigate('/dashboard')} className="gap-1.5 text-neutral-600">
           <ArrowLeft className="h-4 w-4" /> Dashboard
         </Button>
       </div>
 
-      <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-        <div>
+      <div className="mb-6 flex flex-col gap-4 border-b border-neutral-100 pb-6 sm:flex-row sm:items-start sm:justify-between">
+        <div className="min-w-0">
           <div className="mb-2 flex items-center gap-3">
-            <h1 className="text-2xl font-semibold tracking-tight text-neutral-900">
+            <h1 className="truncate text-2xl font-semibold tracking-tight text-neutral-900 sm:text-3xl">
               {proposal.project_title || 'Untitled proposal'}
             </h1>
             <div className={cn('flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium', meta.bg, meta.text)}>
@@ -119,7 +119,7 @@ export function ProposalDetailPage() {
             {proposal.client_name || 'No client'} · {formatCurrency(proposal.total_value, proposal.currency)} · Updated {relativeTime(proposal.updated_at)}
           </p>
         </div>
-        <div className="flex flex-wrap gap-2">
+        <div className="flex flex-wrap gap-2 sm:justify-end">
           {!readOnly && (
             <Button variant="outline" size="sm" onClick={() => navigate(`/proposals/${proposal.id}/edit`)} className="gap-1.5">
               <Pencil className="h-4 w-4" /> Edit
@@ -147,8 +147,8 @@ export function ProposalDetailPage() {
           <ProposalPreview proposal={proposal} />
         </div>
       ) : (
-        <div className="grid gap-6 lg:grid-cols-3">
-          <div className="space-y-6 lg:col-span-2">
+        <div className="grid gap-6 xl:grid-cols-[minmax(0,1.35fr)_minmax(320px,0.65fr)]">
+          <div className="min-w-0 space-y-6">
             {/* Signed banner */}
             {isSigned && signature && (
               <Card className="border-emerald-200 bg-emerald-50/50 p-6">
@@ -273,7 +273,7 @@ export function ProposalDetailPage() {
           </div>
 
           {/* Right column */}
-          <div className="space-y-6">
+          <div className="min-w-0 space-y-6">
             {/* Proposal score */}
             <Card className="border-neutral-200 p-6">
               <h3 className="mb-4 flex items-center gap-2 text-sm font-medium text-neutral-900">

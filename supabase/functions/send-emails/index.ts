@@ -45,7 +45,7 @@ Deno.serve(async (req: Request) => {
       const freelancerEmail = profile?.email || (await getAuthEmail(supabase, proposal.user_id));
       if (!freelancerEmail) return json({ error: "No freelancer email" }, 400);
 
-      const proposalUrl = `${getBaseUrl(url)}/proposals/${proposal.id}`;
+      const proposalUrl = `${getBaseUrl(url)}/p/${proposal.slug}`;
       const subject = `Signed: ${proposal.project_title || "Your proposal"}`;
       const html = signedNotificationHtml(proposal, proposalUrl);
 
