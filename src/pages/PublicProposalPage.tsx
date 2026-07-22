@@ -70,7 +70,7 @@ export function PublicProposalPage() {
     return () => {
       const duration = Math.floor((Date.now() - viewStartTime.current) / 1000);
       if (slug && duration > 2) {
-        supabase.rpc('public_record_view_analytics', { p_slug: slug, p_duration_seconds: duration }).then(() => {});
+        supabase.rpc('public_record_view_analytics', { p_slug: slug, p_duration_seconds: duration }).then(() => { });
       }
     };
   }, [slug]);
@@ -326,11 +326,12 @@ function SignModal({
       return;
     }
     // Notify freelancer
+    const appBaseUrl = import.meta.env.VITE_APP_BASE_URL || window.location.origin;
     fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/send-emails?action=send-signed-notification`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', apikey: import.meta.env.VITE_SUPABASE_ANON_KEY },
-      body: JSON.stringify({ proposal_id: proposal.id }),
-    }).catch(() => {});
+      body: JSON.stringify({ proposal_id: proposal.id, app_base_url: appBaseUrl }),
+    }).catch(() => { });
     onSigned({
       id: '', proposal_id: proposal.id, signer_name: signerName, signer_email: signerEmail,
       signature_type: sigType, signature_data: sigData, contract_text: contractText,
