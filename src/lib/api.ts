@@ -58,9 +58,6 @@ export async function createProposalDraft(templateId: string): Promise<Proposal>
       sections: sections,
       packages: [],
       add_ons: [],
-      view_count: 0,
-      total_view_time_seconds: 0,
-      client_selected_addons: [],
     })
     .select('*')
     .maybeSingle();
@@ -86,7 +83,10 @@ export async function sendProposal(id: string): Promise<void> {
   if (emailResult.error) throw new Error(`Proposal sent, but email delivery failed: ${emailResult.error}`);
 }
 
+
 const EMAIL_FN_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/send-emails`;
+// The app's public URL used in email links. Falls back to the current browser origin.
+const APP_BASE_URL = import.meta.env.VITE_APP_BASE_URL || window.location.origin;
 
 async function callEmailFunction(action: string, body: unknown): Promise<{ ok?: boolean; error?: string }> {
   const { data: { session } } = await supabase.auth.getSession();
@@ -97,7 +97,8 @@ async function callEmailFunction(action: string, body: unknown): Promise<{ ok?: 
       Authorization: `Bearer ${session?.access_token || import.meta.env.VITE_SUPABASE_ANON_KEY}`,
       apikey: import.meta.env.VITE_SUPABASE_ANON_KEY,
     },
-    body: JSON.stringify(body),
+    // Include app_base_url so the Edge Function builds correct links
+    body: JSON.stringify({ ...( body as object ), app_base_url: APP_BASE_URL }),
   });
   if (!res.ok) return { error: `HTTP ${res.status}` };
   return res.json();

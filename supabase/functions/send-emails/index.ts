@@ -3,15 +3,17 @@ import { createClient } from "npm:@supabase/supabase-js@2.58.0";
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
-  "Access-Control-Allow-Headers": "Content-Type, Authorization, X-Client-Info, Apikey",
+  "Access-Control-Allow-Headers": "Content-Type, Authorization, X-Client-Info, Apikey, X-Supabase-Api-Version",
+  "Access-Control-Max-Age": "86400",
 };
 
 const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
 const RESEND_FROM_EMAIL = Deno.env.get("RESEND_FROM_EMAIL") || "SignedIn5 <hello@ggcram.com>";
 
 Deno.serve(async (req: Request) => {
+  // Handle CORS preflight — MUST return 204 (no content) for OPTIONS
   if (req.method === "OPTIONS") {
-    return new Response(null, { status: 200, headers: corsHeaders });
+    return new Response(null, { status: 204, headers: corsHeaders });
   }
 
   try {
@@ -26,7 +28,8 @@ Deno.serve(async (req: Request) => {
     // ---- Action: send-signed-notification ----
     // Called when a proposal is signed. Notifies the freelancer.
     if (action === "send-signed-notification") {
-      const { proposal_id } = await req.json();
+      const body = await req.json();
+      const { proposal_id, app_base_url } = body;
       if (!proposal_id) return json({ error: "Missing proposal_id" }, 400);
 
       const { data: proposal } = await supabase
@@ -45,7 +48,7 @@ Deno.serve(async (req: Request) => {
       const freelancerEmail = profile?.email || (await getAuthEmail(supabase, proposal.user_id));
       if (!freelancerEmail) return json({ error: "No freelancer email" }, 400);
 
-      const proposalUrl = `${getBaseUrl(url)}/p/${proposal.slug}`;
+      const proposalUrl = `${resolveBaseUrl(url, app_base_url)}/p/${proposal.slug}`;
       const subject = `Signed: ${proposal.project_title || "Your proposal"}`;
       const html = signedNotificationHtml(proposal, proposalUrl);
 
@@ -90,7 +93,8 @@ Deno.serve(async (req: Request) => {
     // ---- Action: send-proposal-link ----
     // Called when freelancer sends the proposal. Emails the client the link.
     if (action === "send-proposal-link") {
-      const { proposal_id } = await req.json();
+      const body = await req.json();
+      const { proposal_id, app_base_url } = body;
       if (!proposal_id) return json({ error: "Missing proposal_id" }, 400);
 
       const { data: proposal } = await supabase
@@ -101,7 +105,7 @@ Deno.serve(async (req: Request) => {
       if (!proposal) return json({ error: "Proposal not found" }, 404);
       if (!proposal.client_email) return json({ error: "No client email" }, 400);
 
-      const publicUrl = `${getBaseUrl(url)}/p/${proposal.slug}`;
+      const publicUrl = `${resolveBaseUrl(url, app_base_url)}/p/${proposal.slug}`;
       const subject = `${proposal.branding?.business_name || "New"} proposal: ${proposal.project_title}`;
       const html = proposalLinkHtml(proposal, publicUrl);
 
@@ -199,6 +203,12 @@ function getBaseUrl(url: URL): string {
   const envUrl = Deno.env.get("APP_BASE_URL");
   if (envUrl) return envUrl.replace(/\/$/, "");
   return url.origin;
+}
+
+// Prefer the app_base_url passed from the client, then the env var, then fall back to url.origin.
+function resolveBaseUrl(url: URL, appBaseUrl?: string): string {
+  if (appBaseUrl) return appBaseUrl.replace(/\/$/, "");
+  return getBaseUrl(url);
 }
 
 // ---- Email templates ----
