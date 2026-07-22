@@ -84,12 +84,22 @@ export async function sendProposal(id: string): Promise<void> {
 }
 
 
+function getAppBaseUrl(): string {
+  const envUrl = import.meta.env.VITE_APP_BASE_URL;
+  if (envUrl && envUrl.startsWith('http') && !envUrl.includes('localhost')) {
+    return envUrl.replace(/\/$/, '');
+  }
+  if (typeof window !== 'undefined' && window.location && window.location.origin && !window.location.origin.includes('localhost')) {
+    return window.location.origin.replace(/\/$/, '');
+  }
+  return 'https://signedin5.vercel.app';
+}
+
 const EMAIL_FN_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/send-emails`;
-// The app's public URL used in email links. Falls back to the current browser origin.
-const APP_BASE_URL = import.meta.env.VITE_APP_BASE_URL || window.location.origin;
 
 async function callEmailFunction(action: string, body: unknown): Promise<{ ok?: boolean; error?: string }> {
   const { data: { session } } = await supabase.auth.getSession();
+  const baseUrl = getAppBaseUrl();
   const res = await fetch(`${EMAIL_FN_URL}?action=${action}`, {
     method: 'POST',
     headers: {
@@ -98,7 +108,7 @@ async function callEmailFunction(action: string, body: unknown): Promise<{ ok?: 
       apikey: import.meta.env.VITE_SUPABASE_ANON_KEY,
     },
     // Include app_base_url so the Edge Function builds correct links
-    body: JSON.stringify({ ...( body as object ), app_base_url: APP_BASE_URL }),
+    body: JSON.stringify({ ...( body as object ), app_base_url: baseUrl, public_url: baseUrl, baseUrl }),
   });
   if (!res.ok) return { error: `HTTP ${res.status}` };
   return res.json();
